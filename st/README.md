@@ -1,7 +1,7 @@
 # st - simple terminal
 Just my personal build of [st](https://st.suckless.org/) version 0.8.1.
 
-![screenshot](/screenshot.png)
+![screenshot](/st/screenshot.png)
 
 ## Changes
 * Open latest url with shift + left click
