@@ -15,9 +15,11 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <X11/extensions/Xrandr.h>
+#include <X11/extensions/dpms.h>
 #include <X11/keysym.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/XKBlib.h>
 
 #include "arg.h"
 #include "util.h"
@@ -28,6 +30,7 @@ enum {
 	INIT,
 	INPUT,
 	FAILED,
+	CAPS,
 	NUMCOLS
 };
 
@@ -130,15 +133,19 @@ readpw(Display *dpy, struct xrandr *rr, struct lock **locks, int nscreens,
 {
 	XRRScreenChangeNotifyEvent *rre;
 	char buf[32], passwd[256], *inputhash;
-	int num, screen, running, failure, oldc;
-	unsigned int len, color;
+	int caps, num, screen, running, failure, oldc;
+	unsigned int len, color, indicators;
 	KeySym ksym;
 	XEvent ev;
 
 	len = 0;
+	caps = 0;
 	running = 1;
 	failure = 0;
 	oldc = INIT;
+
+	if (!XkbGetIndicatorState(dpy, XkbUseCoreKbd, &indicators))
+		caps = indicators & 1;
 
 	while (running && !XNextEvent(dpy, &ev)) {
 		if (ev.type == KeyPress) {
@@ -179,15 +186,19 @@ readpw(Display *dpy, struct xrandr *rr, struct lock **locks, int nscreens,
 				if (len)
 					passwd[len--] = '\0';
 				break;
+			case XK_Caps_Lock:
+				caps = !caps;
+				break;
 			default:
-				if (num && !iscntrl((int)buf[0]) &&
-				    (len + num < sizeof(passwd))) {
+				if (controlkeyclear && iscntrl((int)buf[0]))
+					continue;
+				if (num && (len + num < sizeof(passwd))) {
 					memcpy(passwd + len, buf, num);
 					len += num;
 				}
 				break;
 			}
-			color = len ? INPUT : ((failure || failonclear) ? FAILED : INIT);
+			color = len ? (caps ? CAPS : INPUT) : (failure || failonclear ? FAILED : INIT);
 			if (running && oldc != color) {
 				for (screen = 0; screen < nscreens; screen++) {
 					XSetWindowBackground(dpy,
@@ -290,6 +301,14 @@ lockscreen(Display *dpy, struct xrandr *rr, int screen)
 }
 
 static void
+monitorreset(Display* dpy, CARD16 standby, CARD16 suspend, CARD16 off)
+{
+	DPMSSetTimeouts(dpy, standby, suspend, off);
+	DPMSForceLevel(dpy, DPMSModeOn);
+	XFlush(dpy);
+}
+
+static void
 usage(void)
 {
 	die("usage: slock [-v] [cmd [arg ...]]\n");
@@ -306,6 +325,7 @@ main(int argc, char **argv) {
 	const char *hash;
 	Display *dpy;
 	int s, nlocks, nscreens;
+	CARD16 standby, suspend, off;
 
 	ARGBEGIN {
 	case 'v':
@@ -366,12 +386,28 @@ main(int argc, char **argv) {
 	if (nlocks != nscreens)
 		return 1;
 
+	/* DPMS-magic to disable the monitor */
+	if (!DPMSCapable(dpy))
+		die("slock: DPMSCapable failed\n");
+	if (!DPMSEnable(dpy))
+		die("slock: DPMSEnable failed\n");
+	if (!DPMSGetTimeouts(dpy, &standby, &suspend, &off))
+		die("slock: DPMSGetTimeouts failed\n");
+	if (!standby || !suspend || !off)
+		/* set values if there arent some */
+		standby = suspend = off = 300;
+
+	DPMSSetTimeouts(dpy, monitortime, monitortime, monitortime);
+	XFlush(dpy);
+
 	/* run post-lock command */
 	if (argc > 0) {
 		switch (fork()) {
 		case -1:
 			die("slock: fork failed: %s\n", strerror(errno));
 		case 0:
+			monitorreset(dpy, standby, suspend, off);
+
 			if (close(ConnectionNumber(dpy)) < 0)
 				die("slock: close: %s\n", strerror(errno));
 			execvp(argv[0], argv);
@@ -382,6 +418,9 @@ main(int argc, char **argv) {
 
 	/* everything is now blank. Wait for the correct password */
 	readpw(dpy, &rr, locks, nscreens, hash);
+
+	/* reset DPMS values to inital ones */
+	monitorreset(dpy, standby, suspend, off);
 
 	return 0;
 }
