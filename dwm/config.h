@@ -19,14 +19,18 @@ static const char *colors[][3]      = {
     [SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
     [SchemeSel]  = { col_gray4, col_gold,  col_gold  },
 };
+static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
+static const unsigned int systrayspacing = 2;   /* systray spacing */
+static const int systraypinningfailfirst = 1;   /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
+static const int showsystray        = 1;     /* 0 means no systray */
 
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
 static const Rule rules[] = {
     /* xprop(1):
-     *	WM_CLASS(STRING) = instance, class
-     *	WM_NAME(STRING) = title
+     *  WM_CLASS(STRING) = instance, class
+     *  WM_NAME(STRING) = title
      */
     /* class      instance    title       tags mask     isfloating   monitor */
     { "Gimp",     NULL,       NULL,       0,            1,           -1 },
@@ -99,8 +103,8 @@ static Key keys[] = {
         { MODKEY|ShiftMask,             XK_q,      quit,           {0} },
         { MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } },
         { MODKEY|ShiftMask,             XK_k,      movestack,      {.i = -1 } },
-        { MODKEY,			XK_u,		shiftview,	{ .i = -1 } },
-        { MODKEY,			XK_i,	shiftview,	{ .i = 1 } },
+        { MODKEY,                       XK_u,           shiftview,      { .i = -1 } },
+        { MODKEY,                       XK_i,   shiftview,      { .i = 1 } },
 };
 
 /* button definitions */
