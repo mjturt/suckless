@@ -1,8 +1,8 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 3;        /* border pixel of windows */
-static const unsigned int gappx     = 18;       /* gap pixel between windows */
+static const unsigned int borderpx  = 2;        /* border pixel of windows */
+static const unsigned int gappx     = 6;       /* gap pixel between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
 static const unsigned int systrayspacing = 2;   /* systray spacing */
@@ -11,7 +11,7 @@ static const int showsystray        = 1;     /* 0 means no systray */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 0;        /* 0 means bottom bar */
 static const char buttonbar[]       = "<O>";
-static const char *fonts[]          = { "monospace:size=10" };
+static const char *fonts[]          = { "Misc Ohsnap:size=10", "GohuFont Nerd Font:size=10" };
 static const char dmenufont[]       = "monospace:size=10";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
@@ -19,10 +19,13 @@ static const char col_gray3[]       = "#bbbbbb";
 static const char col_gray4[]       = "#eeeeee";
 static const char col_cyan[]        = "#005577";
 static const char col_gold[]        = "#87875f";
+static const char col_green[]       = "#719611";
+static const char col_orange[]      = "#ff9800";
+
 static const char *colors[][3]      = {
     /*               fg         bg         border   */
-    [SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-    [SchemeSel]  = { col_gray4, col_gold,  col_gold  },
+    [SchemeNorm] = { col_gold, col_gray1, col_gray2 },
+    [SchemeSel]  = { col_orange, col_gray1,  col_gold  },
 };
 
 /* tagging */
@@ -35,7 +38,8 @@ static const Rule rules[] = {
      */
     /* class      instance    title       tags mask     isfloating   monitor */
     { "Gimp",     NULL,       NULL,       0,            1,           -1 },
-    { "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
+    { "Rambox",   NULL,       NULL,       1 << 1,       0,           -1 },
+    { "Spotify",  "spotify",  NULL,       1 << 2,       0,           -1 },
 };
 
 /* layout(s) */
@@ -80,10 +84,12 @@ static Key keys[] = {
     { MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
     { MODKEY,                       XK_minus,  togglescratch,  {.v = scratchpadcmd } },
     { MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
-    { MODKEY,                       XK_h,      focusstack,     {.i = +1 } },
-    { MODKEY,                       XK_l,      focusstack,     {.i = -1 } },
+    { MODKEY,                       XK_h,      focusstack,     {.i = -1 } },
+    { MODKEY,                       XK_l,      focusstack,     {.i = +1 } },
     { MODKEY|ShiftMask,             XK_u,      incnmaster,     {.i = +1 } },
     { MODKEY|ShiftMask,             XK_i,      incnmaster,     {.i = -1 } },
+    { MODKEY|ControlMask,           XK_u,      cyclelayout,    {.i = -1 } },
+    { MODKEY|ControlMask,           XK_i,      cyclelayout,    {.i = +1 } },
     { MODKEY|ControlMask,           XK_h,      setmfact,       {.f = -0.02} },
     { MODKEY|ControlMask,           XK_l,      setmfact,       {.f = +0.02} },
     { MODKEY|ShiftMask,             XK_Return, zoom,           {0} },
@@ -109,7 +115,7 @@ static Key keys[] = {
     TAGKEYS(                        XK_7,                      6)
     TAGKEYS(                        XK_8,                      7)
     TAGKEYS(                        XK_9,                      8)
-    { MODKEY|ShiftMask,             XK_q,      quit,           {0} },
+    { MODKEY|ShiftMask,             XK_r,      quit,           {0} },
     { MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } },
     { MODKEY|ShiftMask,             XK_k,      movestack,      {.i = -1 } },
     { MODKEY|ShiftMask,             XK_h,      movestack,      {.i = +1 } },
