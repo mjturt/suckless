@@ -1,6 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
+static const unsigned int panel[] = {30, 0, 0, 0};//positions: 0-top panel, 1-bottom panel, 2-left panel, 3-right panel
 static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int gappx     = 18;       /* gap pixel between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
