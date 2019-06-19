@@ -1,17 +1,12 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int panel[] = {30, 0, 0, 0};//positions: 0-top panel, 1-bottom panel, 2-left panel, 3-right panel
-static const unsigned int borderpx  = 3;        /* border pixel of windows */
-static const unsigned int gappx     = 10;       /* gap pixel between windows */
+static const unsigned int panel[] = {0, 25, 0, 0};//positions: 0-top panel, 1-bottom panel, 2-left panel, 3-right panel
+static const unsigned int borderpx  = 2;        /* border pixel of windows */
+static const unsigned int gappx     = 5;       /* gap pixel between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
-static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
-static const unsigned int systrayspacing = 2;   /* systray spacing */
-static const int systraypinningfailfirst = 1;   /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
-static const int showsystray        = 0;     /* 0 means no systray */
-static const int showbar            = 0;        /* 0 means no bar */
+static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 0;        /* 0 means bottom bar */
-static const char buttonbar[]       = "<O>";
 static const char *fonts[]          = { "Misc Ohsnap:size=10", "GohuFont Nerd Font:size=10" };
 static const char dmenufont[]       = "monospace:size=10";
 static const char col_gray1[]       = "#222222";
@@ -26,7 +21,7 @@ static const char col_orange[]      = "#ff9800";
 static const char *colors[][3]      = {
     /*               fg         bg         border   */
     [SchemeNorm] = { col_gold, col_gray1, col_gray2 },
-    [SchemeSel]  = { col_orange, col_gray1,  col_gold  },
+    [SchemeSel]  = { col_orange, col_gray1,  col_cyan  },
 };
 
 /* tagging */
@@ -51,12 +46,11 @@ static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 
 static const Layout layouts[] = {
-    /* symbol     arrange function */
-    { "[]=",      tile },    /* first entry is default */
-    { "[M]",      monocle },
-    { "|M|",      centeredmaster },
-    { ">M>",      centeredfloatingmaster },
-    { "><>",      NULL },    /* no layout function means floating behavior */
+        /* symbol     arrange function */
+        { "[]=",      tile },    /* first entry is default */
+        { "><>",      NULL },    /* no layout function means floating behavior */
+        { "[M]",      monocle },
+        { NULL,       NULL },
 };
 
 /* key definitions */
@@ -76,6 +70,8 @@ static const char *dmenucmd[] = { "rofi", "-show", "drun"};
 static const char *termcmd[]  = { "urxvt", NULL };
 static const char scratchpadname[] = "scratchpad";
 static const char *scratchpadcmd[] = { "urxvt", "-title", scratchpadname, "-geometry", "120x34", "-e", "scratchpad", NULL };
+static const char *restartpoly[] = { "poly", "dwm", NULL };
+static const char *killxinit[] = { "killall", "xinit", NULL };
 
 #include "movestack.c"
 #include "shiftview.c"
@@ -84,23 +80,21 @@ static Key keys[] = {
     /* modifier                     key        function        argument */
     { MODKEY,                       XK_b,      togglebar,      {0} },
     { MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
-    { MODKEY,                       XK_minus,  togglescratch,  {.v = scratchpadcmd } },
     { MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
-    { MODKEY,                       XK_h,      focusstack,     {.i = -1 } },
-    { MODKEY,                       XK_l,      focusstack,     {.i = +1 } },
-    { MODKEY|ShiftMask,             XK_u,      incnmaster,     {.i = +1 } },
-    { MODKEY|ShiftMask,             XK_i,      incnmaster,     {.i = -1 } },
+    { MODKEY|ControlMask,           XK_m,      incnmaster,     {.i = +1 } },
+    { MODKEY|ControlMask,           XK_comma,  incnmaster,     {.i = -1 } },
     { MODKEY|ControlMask,           XK_u,      cyclelayout,    {.i = -1 } },
     { MODKEY|ControlMask,           XK_i,      cyclelayout,    {.i = +1 } },
-    { MODKEY|ControlMask,           XK_h,      setmfact,       {.f = -0.02} },
-    { MODKEY|ControlMask,           XK_l,      setmfact,       {.f = +0.02} },
+    { MODKEY,                       XK_h,      setmfact,       {.f = -0.02} },
+    { MODKEY,                       XK_l,      setmfact,       {.f = +0.02} },
     { MODKEY|ShiftMask,             XK_Return, zoom,           {0} },
     { MODKEY,                       XK_Tab,    view,           {0} },
     { MODKEY,                       XK_w,      killclient,     {0} },
+    { MODKEY|ShiftMask,             XK_c,      killclient,     {0} },
     { MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
     { MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
     { MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
-    { MODKEY,                       XK_space,  setlayout,      {0} },
+    { MODKEY,                       XK_space,  cyclelayout,    {.i = +1 } },
     { MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
     { MODKEY,                       XK_0,      view,           {.ui = ~0 } },
     { MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
@@ -118,21 +112,21 @@ static Key keys[] = {
     TAGKEYS(                        XK_8,                      7)
     TAGKEYS(                        XK_9,                      8)
     { MODKEY|ShiftMask,             XK_r,      quit,           {0} },
+    { MODKEY|ShiftMask,             XK_q,      spawn,          {.v = killxinit } },
+    { MODKEY|ShiftMask,             XK_b,      spawn,          {.v = restartpoly } },
     { MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } },
     { MODKEY|ShiftMask,             XK_k,      movestack,      {.i = -1 } },
-    { MODKEY|ShiftMask,             XK_h,      movestack,      {.i = +1 } },
-    { MODKEY|ShiftMask,             XK_l,      movestack,      {.i = -1 } },
     { MODKEY,                       XK_u,      shiftview,      { .i = -1 } },
     { MODKEY,                       XK_i,      shiftview,      { .i = 1 } },
+    { MODKEY,                       XK_minus,  togglescratch,  {.v = scratchpadcmd } },
 };
 
 /* button definitions */
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
 static Button buttons[] = {
     /* click                event mask      button          function        argument */
-    { ClkButton,            0,              Button1,        spawn,          {.v = termcmd } },
-    { ClkLtSymbol,          0,              Button1,        setlayout,      {0} },
-    { ClkLtSymbol,          0,              Button3,        setlayout,      {.v = &layouts[2]} },
+    { ClkLtSymbol,          0,              Button1,        cyclelayout,    {.i = +1 } },
+    { ClkLtSymbol,          0,              Button3,        cyclelayout,    {.i = -1 } },
     { ClkWinTitle,          0,              Button2,        zoom,           {0} },
     { ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },
     { ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
