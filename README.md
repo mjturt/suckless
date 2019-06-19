@@ -6,3 +6,5 @@ Just my personal builds of [suckless](https://suckless.org/) tools.
 * [slock](./slock)
 
 ![screenshot](./dwm/screenshot.png)
+
+[dotfiles](https://github.com/mjturt/dotfiles)
