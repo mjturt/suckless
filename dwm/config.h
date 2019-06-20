@@ -46,7 +46,7 @@ static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 static const int attachbelow = 1;    /* 1 means attach after the currently active window */
 
-#include "tcl.c"
+// #include "tcl.c"
 
 static const Layout layouts[] = {
         /* symbol     arrange function */
