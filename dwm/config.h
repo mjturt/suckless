@@ -34,8 +34,8 @@ static const Rule rules[] = {
      */
     /* class      instance    title       tags mask     isfloating   monitor */
     { "Gimp",     NULL,       NULL,       0,            1,           -1 },
-    { "Rambox",   NULL,       NULL,       1 << 1,       0,           -1 },
-    { "Spotify",  "spotify",  NULL,       1 << 2,       0,           -1 },
+    { "Rambox",   NULL,       NULL,       1 << 1,       0,           0 },
+    { "Spotify",  "spotify",  NULL,       1 << 2,       0,           0 },
     { "Polybar",  "polybar",  NULL,       0,            1,           -1 },
     { "Yad",      "yad",      NULL,       0,            1,           -1 },
 };
@@ -70,7 +70,7 @@ static const char *dmenucmd[] = { "rofi", "-show", "drun"};
 static const char *termcmd[]  = { "urxvt", NULL };
 static const char scratchpadname[] = "scratchpad";
 static const char *scratchpadcmd[] = { "urxvt", "-title", scratchpadname, "-geometry", "120x34", "-e", "scratchpad", NULL };
-static const char *restartpoly[] = { "poly", "dwm", NULL };
+static const char *restartpoly[] = { "poly", NULL };
 static const char *killxinit[] = { "killall", "xinit", NULL };
 
 #include "movestack.c"
@@ -93,15 +93,15 @@ static Key keys[] = {
     { MODKEY|ShiftMask,             XK_c,      killclient,     {0} },
     { MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
     { MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
-    { MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
+    { MODKEY,                       XK_n,      setlayout,      {.v = &layouts[2]} },
     { MODKEY,                       XK_space,  cyclelayout,    {.i = +1 } },
     { MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
     { MODKEY,                       XK_0,      view,           {.ui = ~0 } },
     { MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
-    { MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
-    { MODKEY,                       XK_period, focusmon,       {.i = +1 } },
-    { MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
-    { MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
+    { MODKEY,                       XK_m,      focusmon,       {.i = -1 } },
+    { MODKEY,                       XK_comma,  focusmon,       {.i = +1 } },
+    { MODKEY|ShiftMask,             XK_m,      tagmon,         {.i = -1 } },
+    { MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = +1 } },
     TAGKEYS(                        XK_1,                      0)
     TAGKEYS(                        XK_2,                      1)
     TAGKEYS(                        XK_3,                      2)
