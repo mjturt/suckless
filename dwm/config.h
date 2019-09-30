@@ -38,6 +38,7 @@ static const Rule rules[] = {
     { "Spotify",  "spotify",  NULL,       1 << 2,       0,           0 },
     { "Polybar",  "polybar",  NULL,       0,            1,           -1 },
     { "Yad",      "yad",      NULL,       0,            1,           -1 },
+    { "Xdialog",  "Xdialog",  NULL,       0,            1,           -1 },
 };
 
 /* layout(s) */
